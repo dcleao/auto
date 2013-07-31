@@ -21,32 +21,30 @@ all: \
 
 dist/auto.core.js: \
 	${CORE_SRC}base.js \
+	${CORE_SRC}merge.js \
 	${CORE_SRC}typeDef.js \
-	${CORE_SRC}typesDefs/fun.js \
-	${CORE_SRC}typesDefs/string.js \
-	${CORE_SRC}typesDefs/error.js \
-	${CORE_SRC}typesDefs/object.js \
+	${CORE_SRC}typeDefs/fun.js \
+	${CORE_SRC}typeDefs/string.js \
+	${CORE_SRC}typeDefs/error.js \
+	${CORE_SRC}typeDefs/object.js \
 	${CORE_SRC}safeFactory.js \
-	${CORE_SRC}types/abstract.js \
-	${CORE_SRC}typesDefs/array.js \
-	${CORE_SRC}typesDefs/number.js \
-	${CORE_SRC}typesDefs/array.like.js \
+	${CORE_SRC}type.js \
+	${CORE_SRC}typeDefs/array.js \
+	${CORE_SRC}typeDefs/number.js \
+	${CORE_SRC}typeDefs/array.like.js \
 	${CORE_SRC}math.js \
 	${CORE_SRC}disposable.js \
 	${CORE_SRC}enumerator.js \
-	${CORE_SRC}typesDefs/enumerator.js \
+	${CORE_SRC}typeDefs/enumerator.js \
 	${CORE_SRC}enumerator.terminals.js \
 	${CORE_SRC}generator.js \
 	${CORE_SRC}generators/sequence.js \
 	${CORE_SRC}generators/random.js \
 	${CORE_SRC}enumerable.js \
-	${CORE_SRC}typesDefs/enumerable.js \
+	${CORE_SRC}typeDefs/enumerable.js \
 	${CORE_SRC}queryable.js \
-	${CORE_SRC}typesDefs/queryable.js \
+	${CORE_SRC}typeDefs/queryable.js \
 	${CORE_SRC}queryable.methods.js
-#	${CORE_SRC}types/space.js \
-#	${CORE_SRC}types/typeName.js \
-#	${CORE_SRC}types/type.js
     
 test: all
 	@$(JS_TESTER)

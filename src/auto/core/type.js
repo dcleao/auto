@@ -4,7 +4,6 @@ function TypePrivate(pub, basePriv) {
     this.pub = pub;
     var is;
     if(basePriv) {
-        (basePriv instanceof TypePrivate) || A.assert("Invalid base type");
         this._base = basePriv;
         is = O_create(basePriv._is);
     } else {
@@ -13,7 +12,6 @@ function TypePrivate(pub, basePriv) {
     
     this._is = is;
     is[O_id(pub)] = 1;
-
 }
 
 var O_propStrictEqualTo1 = function(p) { return this[p] === 1; };
@@ -25,8 +23,8 @@ O_copy(TypePrivate.prototype, {
     _init:      N, // Local init method.
     _post:      N, // Local post method.
     _mixes:     N, // List of mixed-in types-private.
-    _mixesSub:  N, // List of types-private that have this one mixed-in.
     _mixesById: N, // Map of mixed-in types-private, by their id.
+    _mixesSub:  N, // List of types-private that have this one mixed-in.
     _stepsInit: N, // Constructor/init steps.
     _stepsPost: N, // Constructor/post steps.
     _is:        N, // Map of All, local or inherited, base/mixed/interface types: id -> 1.
@@ -37,7 +35,7 @@ O_copy(TypePrivate.prototype, {
         return base && base.pub;
     },
 
-    // Always complete info
+    // Always up to date info
     inherits: function(TypePub) { return this._is[O_id(TypePub)] === 1; },
     
     // Setting only valid BEFORE build
@@ -71,10 +69,34 @@ O_copy(TypePrivate.prototype, {
         args.forEach(function(arg) { 
             if(A.object.is(arg))   { this._props(arg); }
             else if(A.fun.is(arg)) { this._mix  (arg); }
-            else { throw A.error.arg.invalid('args'); }
+            else { throw A.error.arg.invalid('args');  }
         }, this);
 
         return this.pub;
+    },
+
+    // Only valid BEFORE build
+    // Shared/Static
+    addShared: function(args) {
+        !this.isBuilt || Type_failBuilt();
+
+        args.forEach(function(arg) { 
+            if(A.object.is(arg))   { this._propsShared(arg); }
+            else if(A.fun.is(arg)) { this._propsShared(arg.prototype); }
+            else { throw A.error.arg.invalid('args');  }
+        }, this);
+
+        return this.pub;
+    },
+
+    getShared: function(p, dv) {
+        var priv = this;
+        do {
+            var Pub = priv.pub;
+            if(Op_hasOwn.call(Pub, p)) { return Pub[p]; }
+        } while((priv = priv._base));
+
+        return dv;
     },
 
     // Called from first instance being newed up.
@@ -108,7 +130,7 @@ O_copy(TypePrivate.prototype, {
 
     // Called by add - only valid BEFORE build
     _props: function(map) {
-        var Base = this._base && this._base.pub;
+        var Base = this.base();
         var Base_proto = Base && A.is(map, Base) ? Base.prototype : N;
         var This_proto = this.pub.prototype;
         var isAbstractProto = (This_proto === Abstract_proto)
@@ -121,23 +143,55 @@ O_copy(TypePrivate.prototype, {
                (!isAbstractProto && p === 'base')) { continue; }
             
             var value = map[p];
-            
-            // Skip properties that have the same value as that inherited from Base_proto
-            if(Base_proto && (p in Base_proto) && Base_proto[p] === value) { continue; }
+            if(value !== U) {
+               // Skip properties that have the same value as that inherited from Base_proto
+                if(Base_proto && (p in Base_proto) && Base_proto[p] === value) { continue; }
 
-            var method = value && A.fun.as(value);
-            if(method) {
-                // Is there a local/base/mixed previous method?
-                var baseMethod = A.fun.as(This_proto[p]);
+                var method = value && A.fun.as(value);
+                if(method) {
+                    // Is there a local/base/mixed previous method?
+                    var baseMethod = A.fun.as(This_proto[p]);
 
-                This_proto[p] = Type_override(method, baseMethod);
-            } else {
-                // TODO: mixin, recursively!
-                This_proto[p] = value;
+                    This_proto[p] = Type_override(method, baseMethod);
+                } else {
+                    // NOTE: Merge_prop accepts value === N
+                    Merge_prop(This_proto, p, value, /*protectNativeValue*/F_ident); // Can use native object value directly
+                    //This_proto[p] = value;
+                }
             }
         }
     },
-    
+
+    _propsShared: function(map) {
+        var This = this.pub;
+        for(var p in map) {
+            var v2 = map[p];
+            if(v2 !== U && p !== 'prototype' && p !== 'constructor') {
+                // Merge_prop cannot be directly used here,
+                // because inherited values must be obtained through getShared...
+                var o2 = A.object.as(v2);
+                if(o2) {
+                    // Current local or inherited value is a native object?
+                    var v1 = this.getShared(p);
+                    var o1 = A.object.native.as(v1);
+                    if(o1) {
+                        if(!Op_hasOwn.call(This, p)) {
+                            // Localize o1, before merging into
+                            This[p] = o1 = O_create(o1);
+                        }
+                        
+                        // TODO: protectNativeValue = O_create... Why different from non-shared?
+                        A.merge.inherit(o1, o2);
+                        continue;
+                    }
+                }
+
+                // else v2 smashes anything in This[p]
+                This[p] = v2;
+            }
+        }
+    },
+
     // Called by add - only valid BEFORE build
     _mix: function(x) {
         var id   = O_id(x);
@@ -175,6 +229,7 @@ O_copy(TypePrivate.prototype, {
     /*
         We make sure that, locally, a mixin is only used once, in #_mix.
         What about base mixins and mixins' bases and mixins...?
+        For now, we assume that a class can only appear once, in the type relation graph...
 
         A
         .base B
@@ -220,7 +275,7 @@ O_copy(TypePrivate.prototype, {
         // Steps are stored in reverse order
         if(stepsInit.length) { this._stepsInit = stepsInit.reverse(); }
         if(stepsPost.length) { this._stepsPost = stepsPost.reverse(); }
-    }
+    },
 });
 
 // ~~~~ Type (Public) ~~~~
@@ -235,8 +290,18 @@ var Type_proto = {
 
     // {} -> instance methods, properties
     // Function -> Must be a class - Mixin
-    add:  function() { return Type_key(this).add(Ap_slice.call(arguments)); },
+    add: function() { return Type_key(this).add(Ap_slice.call(arguments)); },
 
+    // Not very efficient...but this is usually a one time task, so caching might be unnecessary anyway
+    shared: function() {
+        var Pub = this;
+        return {
+            add: function() { return Type_key(Pub).addShared(Ap_slice.call(arguments)); },
+            get: function(p, dv) { return Type_key(Pub).getShared(p,dv); },
+            instance: function() {  return Pub; }
+        };
+    },
+    
     // Create a sub-Type of this one
     type: function() { return Type_create(this); },
 

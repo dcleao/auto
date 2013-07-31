@@ -115,61 +115,96 @@ vows
                 assert.strictEqual(new Foo().guu, guu);
                 assert.strictEqual(new Foo().zas, zas);
             },
-            "with properties of equal name, and non-function value, the last wins": function() {
-                var Foo = A.type();
-                var bar1 = {};
-                var bar2 = {};
-                Foo.add({bar: bar1}, {bar: bar2});
+            "with properties of equal name": {
+                "and non-function and non-native-object value, the last wins": function() {
+                    var Foo = A.type();
+                    var bar1 = 1;
+                    var bar2 = 2;
+                    Foo.add({bar: bar1}, {bar: bar2});
 
-                assert.strictEqual(new Foo().bar, bar2);
-            },
-            "with methods of equal name, the second replaces the first": function() {
-                var Foo = A.type();
-                var res1 = {};
-                var res2 = {};
-                var bar1 = function() { return res1; };
-                var bar2 = function() { return res2; };
-                Foo.add({bar: bar1}, {bar: bar2});
+                    assert.strictEqual(new Foo().bar, bar2);
+                },
+                "an existing native-object is merged with an object": function() {
+                    var Foo = A.type();
+                    var bar1 = {};
+                    var bar2 = [1, 2, 3]; // an object, but not a native object Object
+                    Foo.add({bar: bar1}, {bar: bar2});
 
-                assert.strictEqual(new Foo().bar(), res2);
-            },
-            "with methods of equal name, the second replaces the first, even if calling `add` twice": function() {
-                var Foo = A.type();
-                var res1 = {};
-                var res2 = {};
-                var bar1 = function() { return res1; };
-                var bar2 = function() { return res2; };
-                Foo.add({bar: bar1}).add({bar: bar2});
+                    var barz = Foo.prototype.bar;
+                    assert.strictEqual(barz, bar1);
+                    assert.strictEqual(barz[0], bar2[0]);
+                    assert.strictEqual(barz[1], bar2[1]);
+                    assert.strictEqual(barz[2], bar2[2]);
+                },
+                "an existing inherited native-object is first localized before merging with an object": function() {
+                    var bar1 = {};
+                    var bar2 = [1, 2, 3]; // an object, but not a native object Object
+                    var Foo = A.type().add({bar: bar1});
+                    var Zas = Foo.type().add({bar: bar2});
+                    
+                    var barz = Zas.prototype.bar;
+                    assert.notStrictEqual(barz, bar1);
+                    assert.notStrictEqual(barz, bar2);
+                    assert.strictEqual(Object.getPrototypeOf(barz), bar1);
 
-                assert.strictEqual(new Foo().bar(), res2);
-            },
-            "with methods of equal name, the second overrides the first, which is callable trough `base`": function() {
-                var Foo = A.type();
-                var res1 = 1;
-                var res2 = 2;
-                var bar1 = function() { return res1; };
-                var bar2 = function() { return res2 + this.base(); };
-                Foo.add({bar: bar1}, {bar: bar2});
+                    assert.strictEqual(barz[0], bar2[0]);
+                    assert.strictEqual(barz[1], bar2[1]);
+                    assert.strictEqual(barz[2], bar2[2]);
 
-                assert.strictEqual(new Foo().bar(), res1 + res2);
-            },
-            "with methods of equal name, the third overrides the second, and the second overrides the first": function() {
-                var Foo = A.type();
-                var res1 = 1;
-                var res2 = 2;
-                var res3 = 3;
-                var bar1 = function() { return res1; };
-                var bar2 = function() { 
-                    assert.strictEqual(this.base, bar1);
-                    return res2 + this.base(); 
-                };
-                var bar3 = function() {
-                    assert.notStrictEqual(this.base, bar2);
-                    return res3 + this.base(); 
-                };
-                Foo.add({bar: bar1}, {bar: bar2}, {bar: bar3});
+                    assert.isTrue(Object.prototype.hasOwnProperty.call(barz, '0'));
+                    assert.isTrue(Object.prototype.hasOwnProperty.call(barz, '1'));
+                    assert.isTrue(Object.prototype.hasOwnProperty.call(barz, '2'));
+                },
+                "an existing not-a-native-object is replaced by the new value": function() {
+                    var Foo = A.type();
+                    var bar1 = [1, 2, 3];
+                    var bar2 = {};
+                    Foo.add({bar: bar1}, {bar: bar2});
 
-                assert.strictEqual(new Foo().bar(), res1 + res2 + res3);
+                    var barz = Foo.prototype.bar;
+                    assert.strictEqual(barz, bar2);
+                    assert.isUndefined(barz[0]);
+                    assert.isUndefined(barz[1]);
+                    assert.isUndefined(barz[2]);
+                },
+                "of function value, the second replaces the first": function() {
+                    var Foo = A.type();
+                    var res1 = {};
+                    var res2 = {};
+                    var bar1 = function() { return res1; };
+                    var bar2 = function() { return res2; };
+                    Foo.add({bar: bar1}, {bar: bar2});
+
+                    assert.strictEqual(new Foo().bar(), res2);
+                },
+                "of function value, the second overrides the first, which is callable trough `base`": function() {
+                    var Foo = A.type();
+                    var res1 = 1;
+                    var res2 = 2;
+                    var bar1 = function() { return res1; };
+                    var bar2 = function() { return res2 + this.base(); };
+                    Foo.add({bar: bar1}, {bar: bar2});
+
+                    assert.strictEqual(new Foo().bar(), res1 + res2);
+                },
+                "of function value, the third overrides the second, and the second overrides the first": function() {
+                    var Foo = A.type();
+                    var res1 = 1;
+                    var res2 = 2;
+                    var res3 = 3;
+                    var bar1 = function() { return res1; };
+                    var bar2 = function() { 
+                        assert.strictEqual(this.base, bar1);
+                        return res2 + this.base(); 
+                    };
+                    var bar3 = function() {
+                        assert.notStrictEqual(this.base, bar2);
+                        return res3 + this.base(); 
+                    };
+                    Foo.add({bar: bar1}, {bar: bar2}, {bar: bar3});
+
+                    assert.strictEqual(new Foo().bar(), res1 + res2 + res3);
+                }
             },
             "with a method overriding a non-function value, the method wins": function() {
                 var Foo = A.type();

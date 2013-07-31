@@ -10,11 +10,12 @@ var A      = requirejs("dist/auto");
 vows
 .describe("A.type own")
 .addBatch({
-    "About class hierarchy": {
-        "An instance own type can be obtained": function() {
+    "About the own Type": {
+        "An instance's own type can be obtained": function() {
             var Foo = A.type();
             var foo = new Foo();
 
+            // Obtain (creating if necessary) the instance's own type
             var OwnType = A.type(foo);
 
             assert.isNotNull(OwnType);
@@ -45,7 +46,7 @@ vows
         }
     },
     "About defining instance own methods": {
-        "The original types methods are still accessible": function() {
+        "The original type's methods are still accessible": function() {
             var Foo = A.type().add({test: function() { return 1; }});
             var foo = new Foo();
 
@@ -53,7 +54,7 @@ vows
 
             assert.strictEqual(foo.test(), 1);
         },
-        "The original types methods are overriden by own methods": function() {
+        "The original type's methods are overriden by own methods": function() {
             var Foo = A.type().add({test: function() { return 1; }});
             
             var foo = new Foo();
