@@ -1,4 +1,4 @@
-// loadtime: base(typeDef, O_lazyOwn, typeDef_makeAs)
+// loadtime: base(typeDef, O_lazyOwn)
 // runtime:  base(O_create, A.copy.notUndef)
 
 A.object = typeDef(function(_) {
@@ -10,23 +10,42 @@ A.object = typeDef(function(_) {
     _.lazy = function(o, p, f, x) { return o[p] || (o[p] = (f ? f.call(x, p) : {})); };
     _.lazy.own = O_lazyOwn; // defined in base
 
-    _.native = {
-        // Sightly faster than (typeof v === 'object') but may cause boxing?
-        is: function(v) { return !!v && v.constructor === Object; }
+    // Slightly faster than (typeof v === 'object') but may cause boxing?
+    var _nat = _.native = {
+        is: function(v) { return !!v && v.constructor === Object; },
+        as: function(v) { return _nat.is(v) ? v : N; }
     };
 
-    _.native.as = typeDef_makeAs(_.native.is);
-
-    A.create = _.create = function(sup) {
-        var sub = sup ? O_create(sup.prototype || sup) : {};
-        var args = arguments, L = args.length, i = 1;
-        while(i < L) {
-            var arg = args[i++];
-            if(arg) { A.copy.notUndef(sub, arg.prototype || arg); }
+    A.create = _.create = function(/*[deep,] sup, merge1, merge2, ...*/) {
+        var merges = Ap_slice.call(arguments);
+        var deep = true;
+        var sup  = merges.shift();
+        if(typeof sup === 'boolean') {
+            deep = sup;
+            sup  = merges.shift();
         }
+
+        var sub;
+        if(sup) {
+            sub = O_create(sup.prototype || sup);
+            if(deep) { createRecursive(sub); }
+        } else {
+            sub = {};
+        }
+        
+        if(merges.length) { Merge_many(sub, merges, O_create/*protectNativeObj*/); }
+        
         return sub;
     };
     
+    // Cycles will make this crash with stack-overflow...
+    function createRecursive(o) {
+        for(var p in o) {
+            var no = _nat.is(o[p]);
+            if(no) { createRecursive((o[p] = O_create(no))); }
+        }
+    }
+
     // How to call a constructor dynamically? 
     // ->  new Class.apply(null, args) is not valid
     A.make = _.make = function(Class, args) {

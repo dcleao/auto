@@ -110,7 +110,7 @@ var A = O_copy({}, {
     scope: function(f, x) { return f.call(x); },
     
     // Checks if some value is a non-null object and that 
-    // it inherits from a specified class or implements a specified interface.
+    // it is an instance of a specified class or implements a specified interface.
     // If the value's type does not inherit from the given class/interface,
     // then the object's local type map is checked for explicit implementation.
     is: function(o, C)  { return (o instanceof C) || (!!C.is && C.is(o)); },

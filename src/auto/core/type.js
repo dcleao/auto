@@ -292,7 +292,8 @@ var Type_proto = {
     // Function -> Must be a class - Mixin
     add: function() { return Type_key(this).add(Ap_slice.call(arguments)); },
 
-    // Not very efficient...but this is usually a one time task, so caching might be unnecessary anyway
+    // Not very efficient...but at least #add is usually a one time task, 
+    // so caching might be unnecessary anyway
     shared: function() {
         var Pub = this;
         return {
@@ -308,15 +309,22 @@ var Type_proto = {
     // Compile, close
     build: function() { return Type_key(this).build(); },
 
-    inherits: function(TypePub) { return Type_key(this).inherits(TypePub); },
+    // Indicates if this type inherits from a given type.
+    // inherits-from(.) <=> is-based-on(.) or has-mixed-in(.)
+    inherits: function(BaseOrMixin) { return Type_key(this).inherits(BaseOrMixin); },
 
+    // SuperClass.inheritedBy(SubClass)
+    // inherited-by(.) <=> is-base-of(.) or is-mixed-in-by(.)
+    inheritedBy: function(Sub) {
+        var SubPriv = Sub && Type_key(Sub);
+        return !!SubPriv && SubPriv.inherits(this);
+    },
+
+    // Indicates if a given value is an instance of, or has mixed-in this, type.
+    // Foo.is(foo)
+    // A.string.is(s)
     is: function(o) {
-        // Could call C2.inherits, 
-        // but we make one less function call this way.
-        var C2Priv;
-        return (o instanceof Object) &&     
-               !!(C2Priv = Type_key(o.constructor)) && 
-               C2Priv.inherits(this);
+        return (o instanceof Object) && this.inheritedBy(o.constructor);
     },
 
     as: function(o) { return this.is(o) ? o : N; }
@@ -386,29 +394,37 @@ Abstract.add({
     base: F_noop
 });
 
-A.type = function(o) {
-    if(o === U) { return A.Abstract.type(); }
-    if(A.object.is(o)) {
+// The typeDef of an A."Type"
+A.type = typeDef(function(_) {
+    
+    //  a. No arguments or 1-Undefined -> Create a type
+    //  b. 1-!Undefined argument -> Obtain (creating it if necessary) an instance's own type.
+    _.to = function(o) {
+        if(o === U) { return A.Abstract.type(); }
+        if(A.object.is(o)) {
+            // Obtain the instance's own type
+            var C = o.constructor || A.assert("Has no constructor!");
 
-        // Obtain the instance's own type
-        var C = o.constructor || A.fail.arg.invalid('o', "Has no constructor.");
+            // Already a prototype with an associated class?
+            if(C.prototype === o) { return C; }
 
-        // Already a prototype with an associated class?
-        if(C.prototype === o) { return C; }
+            // Make sure it's an A.type.
+            Type_key(C) || A.fail.arg.invalid('o', "Not an instance of a A.Abstract");
 
-        // Make sure it's an A.type.
-        Type_key(C) || A.fail.arg.invalid('o', "Not an instance of a A.Abstract");
+            // Create a sub-type of C.
+            var C2 = C.type();
 
-        // Create a sub-type of C.
-        var C2 = C.type();
+            // Re-wire C2 and o.
+            C2.prototype  = o;
+            o.constructor = C2;
 
-        // Re-wire C2 and o.
-        C2.prototype  = o;
-        o.constructor = C2;
+            return C2;
+        }
+    };
 
-        return C2;
-    }
-};
+    // Test if a something is a Type.
+    _.is = function(C) { return C != N && !!Type_key(C); };
+});
 
 // ~~~~ OVERRIDE ~~~~
 // When `forceBase` is truthy, 

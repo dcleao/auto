@@ -26,7 +26,7 @@ vows
 
             var OwnType = A.type(foo);
 
-            assert.isTrue(OwnType.inherits(Foo));
+            assert.isTrue(Foo.inheritedBy(OwnType));
         },
         "An instance with an own type is still an instance of its original type": function() {
             var Foo = A.type();
@@ -78,10 +78,9 @@ vows
         // But what about dispose?
         "An instance can be mixed with types whether or not they're in its original type": function() {
             var Foo = A.type().add({test: function() { return 1; }});
-            
-            var Bar = A.type().add({test: function() { return 2 + this.base(); }});
-
             var foo = new Foo();
+
+            var Bar = A.type().add({test: function() { return 2 + this.base(); }});
 
             // Mixin Bar in foo
             A.type(foo).add(Bar);
