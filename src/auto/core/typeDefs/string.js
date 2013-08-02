@@ -1,6 +1,6 @@
-// loadtime: typeDef
+// loadtime: 
 // runtime:  A.fun.is
-A.string = typeDef(function(_) {
+A.string = A.type.predicate(function(_) {
 	_.to = function(v, ds) {
     	// NOTE: when value is an object, that contains a valueOf method,
         // with the + operator, valueOf is called instead of toString, 

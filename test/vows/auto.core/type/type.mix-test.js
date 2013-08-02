@@ -13,22 +13,22 @@ vows
     "Calling add": {
         "with a type": {
             "works": function() {
-                var Bar = A.type();
-                var Foo = A.type().add(Bar);
+                var Bar = A.Base.extend();
+                var Foo = A.Base.extend().add(Bar);
             },
             "its instances": {
                 "are instances of the mixin-type as well, according to A.is": function() {
-                    var Bar = A.type();
-                    var Foo = A.type().add(Bar);
+                    var Bar = A.Base.extend();
+                    var Foo = A.Base.extend().add(Bar);
 
                     assert.isTrue(A.is(new Foo(), Foo));
                     assert.isTrue(A.is(new Foo(), Bar));
                 },
                 "are instances of the type, the base type and of the mixed type, according to A.is": function() {
-                    var AAA = A.type();
-                    var BBB = AAA.type();
+                    var AAA = A.Base.extend();
+                    var BBB = AAA.extend();
 
-                    var CCC = A.type();
+                    var CCC = A.Base.extend();
                     AAA.add(CCC);
 
                     assert.isTrue(A.is(new BBB(), BBB));
@@ -39,10 +39,10 @@ vows
             "its properties": {
                 "are placed in the receiving type's prototype": function() {
                     var bar1 = function() {};
-                    var Bar = A.type()
+                    var Bar = A.Base.extend()
                         .add({bar: bar1});
 
-                    var Foo = A.type().add(Bar);
+                    var Foo = A.Base.extend().add(Bar);
 
                     assert.isTrue(Object.prototype.hasOwnProperty.call(Foo.prototype, 'bar'));
                     assert.strictEqual(Foo.prototype.bar, bar1);
@@ -53,11 +53,11 @@ vows
                     var id = 0;
                     var idAInit, idAPost, idBInit, idBPost;
 
-                    var AAA = A.type()
+                    var AAA = A.Base.extend()
                         .init(function(){ idAInit = id++; })
                         .post(function(){ idAPost = id++; });
 
-                    var BBB = A.type()
+                    var BBB = A.Base.extend()
                         .init(function(){ idBInit = id++; })
                         .post(function(){ idBPost = id++; });
 
@@ -72,11 +72,11 @@ vows
                 "are called on the same instance of the type's one": function() {
                     var meAInit, meAPost, meBInit, meBPost;
 
-                    var AAA = A.type()
+                    var AAA = A.Base.extend()
                         .init(function(){ meAInit = this; })
                         .post(function(){ meAPost = this; });
 
-                    var BBB = A.type()
+                    var BBB = A.Base.extend()
                         .init(function(){ meBInit = this; })
                         .post(function(){ meBPost = this; });
 
@@ -92,9 +92,9 @@ vows
                     var id = 0;
                     var idBInit, idBPost;
 
-                    var AAA = A.type();
+                    var AAA = A.Base.extend();
 
-                    var BBB = A.type()
+                    var BBB = A.Base.extend()
                         .init(function(){ idBInit = id++; })
                         .post(function(){ idBPost = id++; });
 
@@ -108,11 +108,11 @@ vows
                     var id = 0;
                     var idAInit, idAPost, idBInit, idBPost;
 
-                    var AAA = A.type()
+                    var AAA = A.Base.extend()
                         .init(function(){ idAInit = id++; })
                         .post(function(){ idAPost = id++; throw Error(); });
 
-                    var BBB = A.type()
+                    var BBB = A.Base.extend()
                         .init(function(){ idBInit = id++; })
                         .post(function(){ idBPost = id++; });
 
@@ -133,9 +133,9 @@ vows
                     var bar1 = function() { return res1; };
                     var bar2 = function() { return res2 + this.base(); };
                     
-                    var Foo = A.type().add({bar: bar1});
+                    var Foo = A.Base.extend().add({bar: bar1});
 
-                    var Bar = A.type().add({bar: bar2});
+                    var Bar = A.Base.extend().add({bar: bar2});
 
                     Foo.add(Bar);
 
@@ -146,23 +146,23 @@ vows
 
         "with more than one type": {
             "works": function() {
-                var Bar = A.type();
-                var Zas = A.type();
-                var Foo = A.type().add(Bar).add(Zas);
+                var Bar = A.Base.extend();
+                var Zas = A.Base.extend();
+                var Foo = A.Base.extend().add(Bar).add(Zas);
             },
             "its `init` and `post` are called after the receiving type's ones": function() {
                 var id = 0;
                 var idAInit, idAPost, idBInit, idBPost, idCInit, idCPost;
 
-                var AAA = A.type()
+                var AAA = A.Base.extend()
                     .init(function(){ idAInit = id++; })
                     .post(function(){ idAPost = id++; });
 
-                var BBB = A.type()
+                var BBB = A.Base.extend()
                     .init(function(){ idBInit = id++; })
                     .post(function(){ idBPost = id++; });
 
-                var CCC = A.type()
+                var CCC = A.Base.extend()
                     .init(function(){ idCInit = id++; })
                     .post(function(){ idCPost = id++; });
 

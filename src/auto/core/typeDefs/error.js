@@ -1,9 +1,9 @@
-// loadtime: base(typeDef, A.scope, A.each.own)
+// loadtime: base(A.scope, A.each.own)
 // runtime:  base(A.is), string(A.format, A.string.join)
 
 // A.error(e)
 // A.error(m, scope)
-A.error = typeDef(function(_) {
+A.error = A.type.predicate(function(_) {
     _.to = function(m, scope) { return _.as(m) || new Error(A.format(m, scope));  };
     _.is = function(v) { return A.is(v, Error); };
 

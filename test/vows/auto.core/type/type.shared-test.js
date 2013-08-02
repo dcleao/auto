@@ -12,7 +12,7 @@ vows
 .addBatch({
     "A shared property": {
         "can be defined and obtained through the constructor": function() {
-            var Foo = A.type();
+            var Foo = A.Base.extend();
 
             var bar1 = {};
             Foo.shared().add({bar: bar1});
@@ -20,7 +20,7 @@ vows
             assert.strictEqual(Foo.bar, bar1);
         },
         "can be defined and cannot be obtained through the instance": function() {
-            var Foo = A.type();
+            var Foo = A.Base.extend();
 
             var bar1 = {};
             Foo.shared().add({bar: bar1});
@@ -32,7 +32,7 @@ vows
         },
         "can be defined twice": {
             "generally, the last overrides the first": function() {
-                var Foo = A.type();
+                var Foo = A.Base.extend();
 
                 var bar1 = 1;
                 var bar2 = 2;
@@ -41,7 +41,7 @@ vows
                 assert.strictEqual(Foo.bar, bar2);
             },
             "a native object is merged with a second object": function() {
-                var Foo = A.type();
+                var Foo = A.Base.extend();
 
                 var bar1 = {};
                 var bar2 = {a:1, b:2, c:3};
@@ -55,11 +55,11 @@ vows
             },
             "an inherited native object is localized and merged with a second object": function() {
                 var bar1 = {};
-                var Foo = A.type();
+                var Foo = A.Base.extend();
                 Foo.shared().add({bar: bar1});
 
                 var bar2 = {a:1, b:2, c:3};
-                var Zas = Foo.type();
+                var Zas = Foo.extend();
                 Zas.shared().add({bar: bar2});
 
                 assert.strictEqual(Object.getPrototypeOf(Zas.bar), bar1);
@@ -73,7 +73,7 @@ vows
                 assert.strictEqual(Zas.bar.c, bar2.c);
             },
             "a native object is replaced by a non-object": function() {
-                var Foo = A.type();
+                var Foo = A.Base.extend();
 
                 var bar1 = {};
                 var bar2 = null;

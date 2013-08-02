@@ -1,6 +1,6 @@
 var ID = A.IDisposable = {dispose: F_noop};
 
-A.disposable = A.typeDef(function(_) {
+A.disposable = A.type.predicate(function(_) {
     _.is = function(v) { return v != N && A.fun.is(v.dispose); };
 });
 

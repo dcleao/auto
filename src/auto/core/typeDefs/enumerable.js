@@ -5,7 +5,7 @@
 // Array-like   -> ...
 // Single item Eble
 
-var toEble = A.enumerable = typeDef(function(_) {
+var toEble = A.enumerable = A.type.predicate(function(_) {
     _.to = function(v) {
         return !arguments.length                 ? NEble :
 

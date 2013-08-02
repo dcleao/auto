@@ -1,9 +1,9 @@
-// loadtime: base(typeDef, F_noop)
+// loadtime: base(F_noop)
 // runtime:  
 
 var F_false;
 
-A.fun = typeDef(function(_) {
+A.fun = A.type.predicate(function(_) {
     _.to = function(v) { return _.is(v) ? v : _.constant(v); };
     _.is = F_is;
     

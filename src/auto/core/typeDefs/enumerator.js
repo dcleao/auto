@@ -3,7 +3,7 @@
 // 
 // Optimized for performance.
 // Could also be coded using Eble/AL/Etor.is/as methods.
-var toEtor = A.enumerator = typeDef(function(_) {
+var toEtor = A.enumerator = A.type.predicate(function(_) {
     _.to = function(v) {
         return !arguments.length                  ? NEtor :
                

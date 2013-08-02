@@ -12,62 +12,62 @@ vows
 .addBatch({
     "About the own Type": {
         "An instance's own type can be obtained": function() {
-            var Foo = A.type();
+            var Foo = A.Base.extend();
             var foo = new Foo();
 
             // Obtain (creating if necessary) the instance's own type
-            var OwnType = A.type(foo);
+            var OwnType = A.type.complex(foo);
 
             assert.isNotNull(OwnType);
         },
         "An instance's own type inherits from the instance's original type": function() {
-            var Foo = A.type();
+            var Foo = A.Base.extend();
             var foo = new Foo();
 
-            var OwnType = A.type(foo);
+            var OwnType = A.type.complex(foo);
 
             assert.isTrue(Foo.inheritedBy(OwnType));
         },
         "An instance with an own type is still an instance of its original type": function() {
-            var Foo = A.type();
+            var Foo = A.Base.extend();
             var foo = new Foo();
 
-            A.type(foo);
+            A.type.complex(foo);
 
             assert.instanceOf(foo, Foo);
         },
         "An instance with an own type is NOT an instance of its own type": function() {
-            var Foo = A.type();
+            var Foo = A.Base.extend();
             var foo = new Foo();
 
-            var OwnType = A.type(foo);
+            var OwnType = A.type.complex(foo);
 
             assert.isFalse(foo instanceof OwnType);
         }
     },
     "About defining instance own methods": {
         "The original type's methods are still accessible": function() {
-            var Foo = A.type().add({test: function() { return 1; }});
+            var Foo = A.Base.extend().add({test: function() { return 1; }});
             var foo = new Foo();
 
-            var OwnType = A.type(foo);
+            var OwnType = A.type.complex(foo);
 
             assert.strictEqual(foo.test(), 1);
         },
         "The original type's methods are overriden by own methods": function() {
-            var Foo = A.type().add({test: function() { return 1; }});
+            var Foo = A.Base.extend().add({test: function() { return 1; }});
             
             var foo = new Foo();
-            A.type(foo).add({test: function() { return this.base() + 2; }});
+            A.type.complex(foo).add({test: function() { return this.base() + 2; }});
 
             assert.strictEqual(foo.test(), 3);
         },
         "The original type's methods are unaffected by its instances' own methods": function() {
-            var Foo = A.type().add({test: function() { }});
+            var Foo = A.Base.extend().add({test: function() { }});
             
             var foo1 = new Foo();
 
-            A.type(foo1).add({test1: function() { }});
+            A.type.complex(foo1).add({test1: function() { }});
 
             var foo2 = new Foo();
             assert.isUndefined(foo2.test1);
@@ -77,13 +77,13 @@ vows
         // Instances ignore mixin's init/post, cause they're already built....
         // But what about dispose?
         "An instance can be mixed with types whether or not they're in its original type": function() {
-            var Foo = A.type().add({test: function() { return 1; }});
+            var Foo = A.Base.extend().add({test: function() { return 1; }});
             var foo = new Foo();
 
-            var Bar = A.type().add({test: function() { return 2 + this.base(); }});
+            var Bar = A.Base.extend().add({test: function() { return 2 + this.base(); }});
 
             // Mixin Bar in foo
-            A.type(foo).add(Bar);
+            A.type.complex(foo).add(Bar);
 
             assert.strictEqual(foo.test(), 3);
             assert.isTrue(A.is(foo, Foo));

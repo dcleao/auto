@@ -1,6 +1,6 @@
-// loadtime: base(typeDef, A_lazyOwn)
+// loadtime: base(A_lazyOwn)
 // runtime:  base(Ap_slice)
-A.array = typeDef(function(_) {
+A.array = A.type.predicate(function(_) {
     _.is = function(v) { return v instanceof Array; };
     _.to = function(v) { return v == N ? N : _.is(v) ? v : [v]; };
 

@@ -1,6 +1,6 @@
 
 // Entry point for creating queries is A.query(.)
-var toQble = A.query = typeDef(function(_) {
+var toQble = A.query = A.type.predicate(function(_) {
     _.to = function(v) {
         return v == N      ? NQble : 
                A.fun.is(v) ? A.create(IQble, {enumerate: v}) : // adhoc Qble

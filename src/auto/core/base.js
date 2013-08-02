@@ -63,8 +63,9 @@ var A_lazyOwn = function(o, p, f, x) {
 };
 
 var F_extend = function(fsup, fsub, props) {
+    var sub;
     if(fsup) {
-        var sub = fsub.prototype = O_create(fsup.prototype || fsup);
+        sub = fsub.prototype = O_create(fsup.prototype || fsup);
         // The following fix causes the undesirable side-effect that
         // `constructor` is inherited by all instances.
         // Setting it, apparently makes it enumerable... 
@@ -72,7 +73,10 @@ var F_extend = function(fsup, fsub, props) {
         //  Or, by the spec, setting the value of a non-enumerable, 
         //  but settable, property makes it loose the non-enumerable setting?)
         sub.constructor = fsub;
+    } else {
+        sub = fsub.prototype;
     }
+    
     if(props) { O_copy(sub, props, Op_has.notUndef); }
     return fsub;
 };
@@ -102,7 +106,7 @@ O_get.own      = function(o, p, dv) { var v; return o != N && Op_hasOwn.call(o, 
 // ~~~~~~~~~~~~
 
 // Root namespace - A, of Auto
-var A = O_copy({}, {
+var A = {
     extend:  F_extend,
     id:      O_id,
     PROP_ID: Auto_ID,
@@ -124,7 +128,7 @@ var A = O_copy({}, {
     //type: { // TODO: is this needed? Already have A.fun.is, A.number.is, ...
     //  is: function(v, t) { return typeof v === t; }
     //},
-
+    
     has: function(o, p) { return o != N && (p in o); },
     
     // get existing prop
@@ -250,7 +254,7 @@ var A = O_copy({}, {
         
         return o;
     }
-});
+};
 
 A.keys.own = function(o, f, x) {
     var ks;

@@ -12,12 +12,12 @@ vows
 .addBatch({
     "Creating a sub type of a custom base type": {
         "works": function() {
-            var AAA = A.type();
-            var BBB = AAA.type();
+            var AAA = A.Base.extend();
+            var BBB = AAA.extend();
         },
         "the instances of the sub-type are instances of the base type, accorfing to A.is": function() {
-            var AAA = A.type();
-            var BBB = AAA.type();
+            var AAA = A.Base.extend();
+            var BBB = AAA.extend();
 
             assert.isTrue(A.is(new BBB(), BBB));
             assert.isTrue(A.is(new BBB(), AAA));
@@ -26,9 +26,9 @@ vows
             var aaa = function() { };
             var bbb = function() { };
 
-            var AAA = A.type().add({aaa: aaa});
+            var AAA = A.Base.extend().add({aaa: aaa});
 
-            var BBB = AAA.type().add({bbb: bbb});
+            var BBB = AAA.extend().add({bbb: bbb});
 
             var b = new BBB();
             assert.strictEqual(b.aaa, aaa);
@@ -39,11 +39,11 @@ vows
                 var id = 0;
                 var idAInit, idBInit, idAPost, idBPost;
 
-                var AAA = A.type()
+                var AAA = A.Base.extend()
                     .init(function() { idAInit = id++; })
                     .post(function() { idAPost = id++; });
 
-                var BBB = AAA.type()
+                var BBB = AAA.extend()
                     .init(function() { idBInit = id++; })
                     .post(function() { idBPost = id++; });
 
@@ -65,11 +65,11 @@ vows
                     });
                 }
                 
-                var AAA = A.type()
+                var AAA = A.Base.extend()
                     .init(assertArgs)
                     .post(assertArgs);
 
-                var BBB = AAA.type()
+                var BBB = AAA.extend()
                     .init(assertArgs)
                     .post(assertArgs);
 
@@ -90,11 +90,11 @@ vows
                     });
                 }
                 
-                var AAA = A.type()
+                var AAA = A.Base.extend()
                     .init(assertArgs)
                     .post(assertArgs);
 
-                var BBB = AAA.type()
+                var BBB = AAA.extend()
                     .init(assertArgs)
                     .post(assertArgs);
 
@@ -108,11 +108,11 @@ vows
             var id = 0;
             var idAInit, idBInit, idAPost, idBPost;
 
-            var AAA = A.type()
+            var AAA = A.Base.extend()
                 .init(function() { idAInit = id++; })
                 .post(function() { idAPost = id++; });
 
-            var BBB = AAA.type()
+            var BBB = AAA.extend()
                 .init(function() { 
                     idBInit = id++;
                     this.base();
@@ -133,17 +133,17 @@ vows
                 var id = 0;
                 var idAInit, idBInit, idCInit, idAPost, idBPost, idCPost;
 
-                var AAA = A.type()
+                var AAA = A.Base.extend()
                     .init(function() { idAInit = id++; })
                     .post(function() { idAPost = id++; });
 
-                var CCC = A.type()
+                var CCC = A.Base.extend()
                     .init(function() { idCInit = id++; })
                     .post(function() { idCPost = id++; });
 
                 AAA.add(CCC);
 
-                var BBB = AAA.type()
+                var BBB = AAA.extend()
                     .init(function() { idBInit = id++; })
                     .post(function() { idBPost = id++; });
 
@@ -159,17 +159,17 @@ vows
                 var id = 0;
                 var idAInit, idBInit, idCInit, idAPost, idBPost, idCPost;
 
-                var AAA = A.type()
+                var AAA = A.Base.extend()
                     .init(function() { idAInit = id++; })
                     .post(function() { idAPost = id++; });
 
-                var CCC = A.type()
+                var CCC = A.Base.extend()
                     .init(function() { idCInit = id++; })
                     .post(function() { idCPost = id++; });
 
                 AAA.add(CCC);
                 
-                var BBB = AAA.type()
+                var BBB = AAA.extend()
                     .init(function() { 
                         idBInit = id++; 
                         this.base();

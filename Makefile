@@ -23,12 +23,13 @@ dist/auto.core.js: \
 	${CORE_SRC}base.js \
 	${CORE_SRC}merge.js \
 	${CORE_SRC}safeFactory.js \
-	${CORE_SRC}typeDef.js \
+	${CORE_SRC}atype.js \
+	${CORE_SRC}ptype.js \
 	${CORE_SRC}typeDefs/fun.js \
 	${CORE_SRC}typeDefs/string.js \
 	${CORE_SRC}typeDefs/error.js \
 	${CORE_SRC}typeDefs/object.js \
-	${CORE_SRC}type.js \
+	${CORE_SRC}ctype.js \
 	${CORE_SRC}typeDefs/array.js \
 	${CORE_SRC}typeDefs/number.js \
 	${CORE_SRC}typeDefs/array.like.js \

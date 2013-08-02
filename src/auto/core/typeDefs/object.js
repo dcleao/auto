@@ -1,7 +1,7 @@
-// loadtime: base(typeDef, O_lazyOwn)
+// loadtime: base(O_lazyOwn)
 // runtime:  base(O_create, A.copy.notUndef)
 
-A.object = typeDef(function(_) {
+A.object = A.type.predicate(function(_) {
     _.to = Object;
 
     // Is (v instanceof Object) faster?

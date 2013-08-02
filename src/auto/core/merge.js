@@ -1,4 +1,8 @@
 
+// loadtime: 
+// runtime:  base(Ap_slice, Op_hasOwn, O_create)
+//           object(A.object.as, A.object.native.as)
+
 A.merge = Merge_create(A.copy);
 
 A.copy.own(A.merge, {
