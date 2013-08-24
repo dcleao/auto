@@ -329,35 +329,36 @@ A_Base.add({
 })
 .build(); // Close the type
 
-// The type predicate of an A."Type"
+// The predicate type associated to a Complex types.
 A.type.complex = A.type.predicate(function(_) {
-    
-    _.is = function(Pub) { return getOwnTypePriv(Pub) instanceof CTypePrivate; };
+    return {
+        is: function(Pub) { return getOwnTypePriv(Pub) instanceof CTypePrivate; },
 
-    //  a. No arguments or 1-Undefined -> Create a type
-    //  b. 1-!Undefined argument -> Obtain (creating it if necessary) an instance's own type.
-    _.to = function(o) {
-        if(o === U) { 
-            return A_Base.extend(); 
-        }
-        if(A.object.is(o)) {
-            // Obtain (creating if necessary) the instance's own complex type
-            var C = o.constructor || A.assert("Has no constructor!");
+        //  a. No arguments or 1-Undefined -> Create a type
+        //  b. 1-!Undefined argument -> Obtain (creating it if necessary) an instance's own type.
+        to: function(o) {
+            if(o === U) { 
+                return A_Base.extend(); 
+            }
+            if(A.object.is(o)) {
+                // Obtain (creating if necessary) the instance's own complex type
+                var C = o.constructor || A.assert("Has no constructor!");
 
-            // Already a prototype with an associated class?
-            if(C.prototype === o) { return C; }
+                // Already a prototype with an associated class?
+                if(C.prototype === o) { return C; }
 
-            // Make sure it's a proper CType
-            _.is(C) || A.fail.arg.invalid('o', "Not an instance of a A.Base");
+                // Make sure it's a proper CType
+                _.is(C) || A.fail.arg.invalid('o', "Not an instance of a A.Base");
 
-            // Create a sub-type of C.
-            var C2 = C.extend();
+                // Create a sub-type of C.
+                var C2 = C.extend();
 
-            // Re-wire C2 and o.
-            C2.prototype  = o;
-            o.constructor = C2;
+                // Re-wire C2 and o.
+                C2.prototype  = o;
+                o.constructor = C2;
 
-            return C2;
+                return C2;
+            }
         }
     };
 });

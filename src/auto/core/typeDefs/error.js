@@ -4,9 +4,6 @@
 // A.error(e)
 // A.error(m, scope)
 A.error = A.type.predicate(function(_) {
-    _.to = function(m, scope) { return _.as(m) || new Error(A.format(m, scope));  };
-    _.is = function(v) { return A.is(v, Error); };
-
     _.types = {};
     _.oper = _.types.oper = {
         invalid: function(m, scope) {
@@ -33,6 +30,11 @@ A.error = A.type.predicate(function(_) {
             var m1 = A.format("Argument '{0}' is not of type '{1}'.", [name, type]);
             return _.to(A.string.join(Z, m1, m), scope);
         }
+    };
+
+    return {
+        to: function(m, scope) { return _.as(m) || new Error(A.format(m, scope));  },
+        is: function(v) { return A.is(v, Error); }
     };
 });
 

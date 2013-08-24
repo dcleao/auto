@@ -1,21 +1,10 @@
 // loadtime: 
 // runtime:  A.fun.is
 A.string = A.type.predicate(function(_) {
-	_.to = function(v, ds) {
-    	// NOTE: when value is an object, that contains a valueOf method,
-        // with the + operator, valueOf is called instead of toString, 
-        // and toString is called on that result only.
-        // Using String(value) ensures toString() is called on the object itself.
-        return v != N ? String(v) : (ds || E);
-    };
-    
-    _.is = function(v) { return typeof v === 'string'; };
-    
-    // nully or empty
+	// nully or empty
     var SE = _.empty = {
     	is: function(v) { return v == N || v === E; }
     };
-
 
     /**
 	 * Formats a string by replacing 
@@ -87,4 +76,16 @@ A.string = A.type.predicate(function(_) {
 
 	    return args.join(sep);
 	};
+
+	return {
+		to: function(v, ds) {
+	    	// NOTE: when value is an object, that contains a valueOf method,
+	        // with the + operator, valueOf is called instead of toString, 
+	        // and toString is called on that result only.
+	        // Using String(value) ensures toString() is called on the object itself.
+	        return v != N ? String(v) : (ds || E);
+	    },
+    
+    	is: function(v) { return typeof v === 'string'; }
+    };
 });

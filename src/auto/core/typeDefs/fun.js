@@ -4,9 +4,6 @@
 var F_false;
 
 A.fun = A.type.predicate(function(_) {
-    _.to = function(v) { return _.is(v) ? v : _.constant(v); };
-    _.is = F_is;
-    
     _.constant = function(v) { return function() { return v; }; };
     _.negate   = function(f) { return function() { return !f.apply(this, arguments); }; };
     _.identity = F_ident;
@@ -17,6 +14,11 @@ A.fun = A.type.predicate(function(_) {
     F_false = 
     _['false'] = function( ) { return F; };
     _['null' ] = function( ) { return N; };
+
+    return {
+        to: function(v) { return _.is(v) ? v : _.constant(v); },
+        is:  F_is
+    };
 });
 
 /*

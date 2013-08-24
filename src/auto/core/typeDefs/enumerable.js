@@ -6,24 +6,26 @@
 // Single item Eble
 
 var toEble = A.enumerable = A.type.predicate(function(_) {
-    _.to = function(v) {
-        return !arguments.length                 ? NEble :
+    return {
+      to: function(v) {
+          return !arguments.length                 ? NEble :
 
-               // An atom
-               (v == N || typeof v !== 'object') ? new SingleEble(v) :
+                 // An atom
+                 (v == N || typeof v !== 'object') ? new SingleEble(v) :
 
-               A.fun.is(v.enumerate)             ? v :
+                 A.fun.is(v.enumerate)             ? v :
 
-               // An array like
-               (v.length != N)                   ? new ALEble(v) :
+                 // An array like
+                 (v.length != N)                   ? new ALEble(v) :
 
-               // An Etor?
-               toEtor.is(v)                      ? new EtorEble(v) :
+                 // An Etor?
+                 toEtor.is(v)                      ? new EtorEble(v) :
 
-               // An object atom
-              new SingleEble(v);
+                 // An object atom
+                new SingleEble(v);
+      },
+      
+      // Has an "enumerate" method
+      is: function(v) { return !!v && A.fun.is(v.enumerate); }
     };
-
-    // Has an "enumerate" method
-    _.is = function(v) { return !!v && A.fun.is(v.enumerate); };
 });

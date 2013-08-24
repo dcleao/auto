@@ -50,7 +50,7 @@ vows
     },
     
     "When called with a null value": {
-        "returns a reset enumerator with one item": function() {
+        "returns a reset enumerator with one item, null": function() {
             var etor = A.enumerator(null);
             assert.isObject(etor);
             assert.strictEqual(etor.index, -1);
@@ -62,7 +62,7 @@ vows
     },
     
     "When called with an undefined value": {
-        "returns a reset enumerator with one item": function() {
+        "returns a reset enumerator with one item, undefined": function() {
             var etor = A.enumerator(undefined);
             assert.isObject(etor);
             assert.strictEqual(etor.index, -1);

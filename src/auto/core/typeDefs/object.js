@@ -2,11 +2,6 @@
 // runtime:  base(O_create, A.copy.notUndef)
 
 A.object = A.type.predicate(function(_) {
-    _.to = Object;
-
-    // Is (v instanceof Object) faster?
-    _.is = function(v) { return !!v && typeof v === 'object'; };
-
     _.lazy = function(o, p, f, x) { return o[p] || (o[p] = (f ? f.call(x, p) : {})); };
     _.lazy.own = O_lazyOwn; // defined in base
 
@@ -52,5 +47,12 @@ A.object = A.type.predicate(function(_) {
         var o = O_create(Class.prototype);
         Class.apply(o, args || EA);
         return o;
+    };
+
+    return {
+        to: Object,
+
+        // Is (v instanceof Object) faster?
+        is: function(v) { return !!v && typeof v === 'object'; }
     };
 });

@@ -1,7 +1,13 @@
-var ID = A.IDisposable = {dispose: F_noop};
+
+var ID = A.IDisposable = {
+	// Default implementation does nothing.
+	dispose: F_noop
+};
 
 A.disposable = A.type.predicate(function(_) {
-    _.is = function(v) { return v != N && A.fun.is(v.dispose); };
+    return {
+    	is: function(v) { return v != N && A.fun.is(v.dispose); }
+    };
 });
 
 // A.IDisposable*
