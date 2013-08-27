@@ -33,6 +33,9 @@ A.error = A.type.predicate(function(_) {
     };
 
     return {
+        // An A.error is also an A.object
+        bases: [A.object],
+        
         to: function(m, scope) { return _.as(m) || new Error(A.format(m, scope));  },
         is: function(v) { return A.is(v, Error); }
     };

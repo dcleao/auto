@@ -38,7 +38,7 @@ function PType_create(def) {
         bases = opts.bases;
         if(bases) { bases = bases.map(getOwnTypePriv); }
     }
-    
+
     // Force id assignment (stored publicly).
     O_id(Pub);
 
@@ -47,14 +47,28 @@ function PType_create(def) {
     // Store private me, in public me
     AType_key.init(Pub, priv);
 
+    // Wrap "is" method with generic implementation
+    Pub.is = PType_wrapIs(priv, Pub.is);
+
     return Pub;
 }
 
-// A smarter predicate is function
+function PType_wrapIs(priv, evalIs) {
+    return function(value) { return PType_is(value, priv, evalIs); };
+}
+
+// Predicate type wrapper "predicate/is" function
+// For instances of complex types, it verifies if 
+// * the ctype has ptype as a base type
+// * the ctype's prototype satisfies the ptype's predicate
+//   in which case, the ptype is added to ctype as a base type.
 function PType_is(value, priv, evalIs) {
+    var Pub = priv.pub;
+
     // 1. If value is not an instance of a complex type, simply call evalIs.
     if(!(value instanceof A_Base)) {
-        return evalIs.call(priv.pub, value);
+        // value may be null, in which case it ends up here.
+        return evalIs.call(Pub, value);
     }
 
     var C = value.constructor;
@@ -64,16 +78,16 @@ function PType_is(value, priv, evalIs) {
     // A complex type instance.
     // Is the CType known to be based on this one?
     // TODO: Could test 0/1 values.
-    if(CPriv.inherits(inherits)) {
+    if(CPriv.inherits(Pub)) {
         // Assume value, as an instance, has not been modified and also is PType...
         return T;
     }
 
     // Does the complex type's prototype satisfy the predicate?
-    var C_proto = C.prototype;
-    var is = evalIs.call(priv.pub, C_proto);
+    var is = evalIs.call(Pub, C.prototype);
     // If is, CPriv is based in PType after all...
-    if(is) { CPriv._mix(this); }
+    // Mixing is available, whether or not the ctype is locked/built, when the mixed-in type is not a complex type.
+    if(is) { CPriv._mixPriv(priv); }
     return is;
     // TODO: Store the 0 in CPriv, so we don't test again
 
@@ -86,8 +100,8 @@ function PType_is(value, priv, evalIs) {
     //  independence to a give instance.
     // We just cannot create an own type, per tested instance,
     //  to store the result.
-    // Even if we wouldn't create an onw type, and thus not store the result,
-    //  we would still be owrsening the performance of every normal false CType_proto test
+    // Even if we wouldn't create an own type, and thus not store the result,
+    //  we would still be worsening the performance of every normal false CType_proto test
     //  to test the instance explicitly.
 }
 

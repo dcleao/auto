@@ -9,7 +9,13 @@ A.array = A.type.predicate(function(_) {
     };
 
     return {
+    	// An A.array is also an A.array.like
+        bases: [AL],
+
     	is: function(v) { return v instanceof Array; },
     	to: function(v) { return v == N ? N : _.is(v) ? v : [v]; }
     };
 });
+
+// Only now A.array exists.
+A.array.like = AL;

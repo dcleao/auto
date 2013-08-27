@@ -27,12 +27,12 @@ dist/auto.core.js: \
 	${CORE_SRC}ptype.js \
 	${CORE_SRC}typeDefs/fun.js \
 	${CORE_SRC}typeDefs/string.js \
-	${CORE_SRC}typeDefs/error.js \
 	${CORE_SRC}typeDefs/object.js \
+	${CORE_SRC}typeDefs/error.js \
 	${CORE_SRC}ctype.js \
+	${CORE_SRC}typeDefs/array.like.js \
 	${CORE_SRC}typeDefs/array.js \
 	${CORE_SRC}typeDefs/number.js \
-	${CORE_SRC}typeDefs/array.like.js \
 	${CORE_SRC}math.js \
 	${CORE_SRC}disposable.js \
 	${CORE_SRC}enumerator.js \

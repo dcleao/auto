@@ -59,7 +59,6 @@ F_extend(ATypePrivate, CTypePrivate, {
     },
 
     add: function() {
-        !this.isBuilt || CType_failBuilt();
         Ap_slice.call(arguments).forEach(this._add, this);
         return this.pub;
     },
@@ -71,8 +70,8 @@ F_extend(ATypePrivate, CTypePrivate, {
     },
     
     _add: function(arg) {
-        if(A.object.is(arg))   { this._props(arg); } 
-        else if(A.fun.is(arg)) { this._mix  (arg); } 
+        if(A.object.is(arg))   { this._props(arg); }
+        else if(A.fun.is(arg)) { this._mix  (arg); }
         else { throw A.error.arg.invalid('arg');   }
     },
 
@@ -113,6 +112,8 @@ F_extend(ATypePrivate, CTypePrivate, {
 
     // Called by add - only valid BEFORE build
     _props: function(map) {
+        !this.isBuilt || CType_failBuilt();
+
         var Base = this.proto();
         var Base_proto = Base && A.is(map, Base) ? Base.prototype : N;
         var This_proto = this.pub.prototype;
@@ -175,11 +176,20 @@ F_extend(ATypePrivate, CTypePrivate, {
         }
     },
 
-    // Called by add - only valid BEFORE build
+    // Called by add - if x is a complex type, then only valid BEFORE build
     _mix: function(x) {
-        var xpriv = AType_key(x); 
+        this._mixPriv(AType_key(x));
+    },
+
+    _mixPriv: function(xpriv) {
+        var isCType = (xpriv instanceof CTypePrivate);
+        !this.isBuilt || !isCType || CType_failBuilt();
+
+        // If x is already mixed, return.
         if(xpriv && !this._addBase(xpriv))  { return; }
-        this._props(x.prototype);
+
+        // Mix x's ctype prototype into this one's.
+        if(isCType) { this._props(xpriv.pub.prototype); }
     },
 
     /*
@@ -323,13 +333,16 @@ var A_Base = A.Base = CType_create(N);
 
 var A_Base_proto = A_Base.prototype;
 
-A_Base.add({
+A_Base
+// An A.Base instance is also an A.object.
+.add(A.object)
+.add({
     // The default implementation, does nothing when called
     base: F_noop
 })
 .build(); // Close the type
 
-// The predicate type associated to a Complex types.
+// The predicate type of Complex types.
 A.type.complex = A.type.predicate(function(_) {
     return {
         is: function(Pub) { return getOwnTypePriv(Pub) instanceof CTypePrivate; },
@@ -337,7 +350,7 @@ A.type.complex = A.type.predicate(function(_) {
         //  a. No arguments or 1-Undefined -> Create a type
         //  b. 1-!Undefined argument -> Obtain (creating it if necessary) an instance's own type.
         to: function(o) {
-            if(o === U) { 
+            if(o === U) {
                 return A_Base.extend(); 
             }
             if(A.object.is(o)) {

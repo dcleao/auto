@@ -12,7 +12,7 @@ vows
 .addBatch({
     "About the own Type": {
         "An instance's own type can be obtained": function() {
-            var Foo = A.Base.extend();
+            var Foo = A.type.complex();
             var foo = new Foo();
 
             // Obtain (creating if necessary) the instance's own type
